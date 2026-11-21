@@ -11,3 +11,27 @@ arrB db 10 dup(?)                        ; output array B
 ; BL = 3 (multiplier)   BH = 2 (multiplier and divisor)
 ; CX = running sum of terms 1 and 2
 ; AX = working register for mul/div
+.code
+main proc
+    mov  ax, @data
+    mov  ds, ax
+
+    xor  si, si             ; i = 0
+    mov  bl, 3              ; constants set once, outside the loop
+    mov  bh, 2
+
+L1:
+    mov  dl, arrA[si]       ; load A[i] once
+    mov  dh, arrC[si]       ; load C[i] once
+
+    ; term 1: A[i]*3 + 1
+    mov  al, dl
+    mul  bl                 ; AX = A[i] * 3 (16-bit, cannot overflow)
+    inc  ax
+    mov  cx, ax             ; CX = term 1
+
+    ; term 2: C[i]*2 + 1
+    mov  al, dh
+    mul  bh                 ; AX = C[i] * 2
+    inc  ax
+    add  cx, ax             ; CX = term 1 + term 2

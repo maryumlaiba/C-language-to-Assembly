@@ -35,3 +35,22 @@ L1:
     mul  bh                 ; AX = C[i] * 2
     inc  ax
     add  cx, ax             ; CX = term 1 + term 2
+ ; term 3: (A[i] + C[i]) / 2 using unsigned div
+    mov  al, dl
+    add  al, dh             ; dividend low byte (max 42, fits in 8 bits)
+    xor  ah, ah             ; clear AH so AX = full unsigned dividend
+    div  bh                 ; AL = quotient, AH = remainder (0)
+
+    ; combine and store
+    xor  ah, ah             ; discard remainder
+    add  ax, cx             ; sum of all three terms
+    mov  arrB[si], al       ; result max is 127, fits in a byte
+
+    inc  si                 ; i++
+    cmp  si, 10
+    jb   L1                 ; repeats while i < 10, so exactly 10 iterations
+
+    mov  ah, 4Ch            ; exit to DOS
+    int  21h
+main endp
+end main
